@@ -1,0 +1,53 @@
+{
+    "name": "Bruno Camara",
+    "email": "brunocamara.work@outlook.com",
+    "phone": "",
+    "location": "Itajaí, Santa Catarina, Brazil",
+    "linkedin": "https://www.linkedin.com/in/bruno-camara-a16021409/",
+    "website": "",
+    
+    "experience": [
+       {
+        "company": "BrightOps",
+        "title": "Senior Software Engineer",
+        "location": "Massachusetts, United States",
+        "start_date": "Aug 2024",
+        "end_date": "Present"
+      },
+      {
+        "company": "The Simple Vue",
+        "title": "Senior Software Engineer",
+        "location": "Georgia, United States",
+        "start_date": "Oct 2022",
+        "end_date": "Jul 2024"
+      },
+      {
+        "company": "Avell Notebooks",
+        "title": "Tech Lead",
+        "location": "Joinville, Santa Catarina, Brazil",
+        "start_date": "Feb 2019",
+        "end_date": "Oct 2022"
+      },   
+      {
+        "company": "Qnet Telecom",
+        "title": "Software Engineer",
+        "location": "Umuarama, Parana, Brazil",
+        "start_date": "Jul 2015",
+        "end_date": "Dec 2018"
+      }
+    ],
+    "education": [
+      {
+        "degree": "Master's degree, Computer Science",
+        "school": "Hodges University",
+        "start_year": "2022",
+        "end_year": "2024"
+      },
+      {
+        "degree": "Bachelor's degree, Computer Science",
+        "school": "Federal University of Technology - Parana",
+        "start_year": "2016",
+        "end_year": "2019"
+      }
+    ]
+  }
