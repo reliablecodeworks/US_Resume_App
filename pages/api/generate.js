@@ -790,7 +790,7 @@ Prefer TARGET ROLE wording when it matches history; otherwise closest honest tit
 
 **3. SUMMARY (REALISTIC SENIOR NARRATIVE — TRACK-AWARE)**
 
-Write exactly 5-6 complete sentences as one flowing paragraph. Each sentence should be rich and 15-25 words. Do NOT write short one-clause fragments.
+Write exactly 5-6 complete sentences as one flowing paragraph. Each sentence should be rich and 10-20 words. Do NOT write short one-clause fragments.
 SUMMARY JSON RULE: "summary" must be ONE single-line string (all sentences joined with spaces). Never put line breaks inside the summary value.
 
 STRUCTURE (one full sentence each — adapt emphasis to detected track; weave in top Tier-1 JD requirements):
@@ -820,7 +820,7 @@ RULES:
 
 **4. SKILLS (REAL-WORLD STACK MODEL — TRACK-SPECIFIC + JD-ALIGNED)**
 
-60-80 skills across 5-8 categories. Category NAMES and contents must match the detected track.
+30-40 skills across 6-8 categories. Category NAMES and contents must match the detected track.
 
 JD ALIGNMENT:
 - Every Tier-1 must-have skill from section 1 must appear in skills (use exact JD phrasing where reasonable for ATS)
@@ -916,7 +916,7 @@ DETAIL-BASED BULLETS (CRITICAL):
 3. Maintain authenticity — Keep core accomplishments, seniority, and technologies from provided details; enhance framing and missing JD coverage, do not replace real work with fiction.
 4. If no details provided — Generate plausible bullets from job title, company, dates, and JD; still satisfy Tier-1 coverage for entry 1-2.
 
-Each bullet should be rich and between 28-35 words (longer if needed to prove level — never shorten into vague bullets).
+Each bullet should be rich and between 25-30 words (longer if needed to prove level — never shorten into vague bullets).
 
 STRUCTURE PER JOB (adapt to detected track — ensure Tier-1 areas each have at least one bullet in recent jobs):
 - Default (product engineering): 1-2 system-level ownership + 2-3 delivery aligned to JD responsibilities + 2-3 optimization/integration/collaboration proving remaining Tier-1 skills

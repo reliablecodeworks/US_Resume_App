@@ -11,7 +11,7 @@ services:
       - key: OPENAI_API_KEY
         sync: false
       - key: OPENAI_MODEL
-        value: gpt-4o-mini
+        value: gpt-5-mini
       - key: NODE_ENV
         value: production
 

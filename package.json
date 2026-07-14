@@ -9,18 +9,14 @@
     },
     "dependencies": {
         "@sparticuz/chromium": "^131.0.0",
-        "formidable": "^2.1.1",
         "handlebars": "^4.7.7",
         "jsonc-parser": "^3.3.1",
         "jsonrepair": "^3.14.0",
         "next": "^14.2.35",
-        "nodemailer": "^7.0.11",
         "openai": "^4.77.0",
-        "pdf-parse": "^1.1.1",
         "puppeteer-core": "^24.30.0",
         "react": "18.2.0",
-        "react-dom": "18.2.0",
-        "resend": "^6.5.2"
+        "react-dom": "18.2.0"
     },
     "engines": {
         "node": "20.x"

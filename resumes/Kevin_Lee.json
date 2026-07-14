@@ -1,0 +1,48 @@
+{
+    "name": "Kevin Lee",
+    "email": "kevinlee.core@gmail.com",
+    "phone": "(224) 478-0066",
+    "location": "Chicago, IL (Open to remote)",
+    "linkedin": "",
+    "website": "",
+    
+    "experience": [
+       {
+        "company": "Calibec",
+        "title": "Senior Software Engineer",
+        "location": "Mission Viejo, CA",
+        "start_date": "Sep 2024",
+        "end_date": "Present"
+      },
+      {
+        "company": "Google",
+        "title": "Senior Software Engineer",
+        "location": "Mountain View, CA",
+        "start_date": "Aug 2021",
+        "end_date": "Jul 2024"
+      },
+      {
+        "company": "JPMorgan Chase & Co.",
+        "title": "Software Engineer",
+        "location": "Chicago, IL",
+        "start_date": "Jul 2020",
+        "end_date": "Jul 2021"
+      },   
+      {
+        "company": "The Aerospace Corporation",
+        "title": "Software Engineering Intern",
+        "location": "EI Segundo, CA",
+        "start_date": "Jan 2018",
+        "end_date": "Jul 2020"
+      }
+    ],
+    "education": [
+      {
+        "degree": "Bachelor's Degree of Computer Science",
+        "school": "Northwestern University",
+        "location": "Evanston, IL",
+        "start_year": "2016",
+        "end_year": "2020"      
+      }
+    ]
+  }
