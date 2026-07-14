@@ -1,0 +1,47 @@
+{
+  "name": "Adrian Urban",
+  "email": "adrian.urban.work@outlook.com",
+  "phone": "",
+  "location": "Warsaw, Mazowieckie, Poland",
+  "linkedin": "https://www.linkedin.com/in/adrian-urban-0504b0414/",
+  "website": "",
+  
+  "experience": [
+     {
+      "company": "Postman",
+      "title": "Senior Full Stack Engineer",
+      "location": "San Francisco, California, United States",
+      "start_date": "Aug 2023",
+      "end_date": "Present"
+    },
+    {
+      "company": "Infermedica",
+      "title": "Backend Engineering Lead",
+      "location": "Warsaw, Mazowieckie, Poland",
+      "start_date": "Mar 2020",
+      "end_date": "Aug 2023"
+    },
+    {
+      "company": "Benchling",
+      "title": "Full Stack Engineer",
+      "location": "San Francisco, California, United States",
+      "start_date": "Nov 2017",
+      "end_date": "Dev 2019"
+    },   
+    {
+      "company": "Brainly",
+      "title": "Back End Developer",
+      "location": "Warsaw, Mazowieckie, Poland",
+      "start_date": "Mar 2016",
+      "end_date": "Oct 2017"
+    }
+  ],
+  "education": [
+    {
+      "degree": "Bachelor's Degree, Information Technology",
+      "school": "Warsaw University of Technology",
+      "start_year": "2011",
+      "end_year": "2015"
+    }
+  ]
+}
