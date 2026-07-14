@@ -1,0 +1,47 @@
+{
+  "name": "Alexandru Victor Barbu",
+  "email": "alexandru.barbu.work@outlook.com",
+  "phone": "+40 758 177 853",
+  "location": "Bucharest, Bucharest, Romania",
+  "linkedin": "https://www.linkedin.com/in/alexandru-victor-barbu-849253417/",
+  "website": "",
+  
+  "experience": [
+     {
+      "company": "Octave",
+      "title": "Senior Full Stack Engineer",
+      "location": "Madison, Alabama, United States",
+      "start_date": "Sep 2023",
+      "end_date": "Present"
+    },
+    {
+      "company": "SeedBlink",
+      "title": "Backend Engineering Lead",
+      "location": "Bucharest, Romania",
+      "start_date": "Oct 2020",
+      "end_date": "Aug 2023"
+    },
+    {
+      "company": "SailPoint",
+      "title": "Full Stack Engineer",
+      "location": "Austin, Texas Metropolitan Area",
+      "start_date": "Aug 2017",
+      "end_date": "Jul 2020"
+    },   
+    {
+      "company": "Endava",
+      "title": "Back End Developer",
+      "location": "Bucharest, Romania",
+      "start_date": "Feb 2016",
+      "end_date": "Jul 2017"
+    }
+  ],
+  "education": [
+    {
+      "degree": "Bachelor's Degree, Information Technology",
+      "school": "Spiru Haret University",
+      "start_year": "2011",
+      "end_year": "2015"
+    }
+  ]
+}
