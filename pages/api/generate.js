@@ -155,6 +155,68 @@ const calculateYears = (experience) => {
   return Math.max(8, Math.round(years));
 };
 
+// Profiles whose template renders raw HTML (triple-brace {{{summary}}} / {{{this}}}) and
+// can therefore show bolded keywords. Adding a profile here WITHOUT switching its template
+// to triple-brace prints literal <strong> tags on the PDF.
+const BOLD_KEYWORD_PROFILES = new Set(["Kevin_Lee"]);
+
+const escapeHtml = (str) =>
+  String(str ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
+const escapeRegExp = (str) => String(str).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+// One alternation over every skill the model produced, longest-first so "Spring Boot" wins
+// over "Spring" and "JavaScript" over "Java".
+const buildKeywordRegex = (skills) => {
+  const terms = [
+    ...new Set(
+      Object.values(skills || {})
+        .flat()
+        .filter((t) => typeof t === "string")
+        .map((t) => t.trim())
+        .filter((t) => t.length >= 2)
+    ),
+  ].sort((a, b) => b.length - a.length);
+
+  if (!terms.length) return null;
+
+  // \b is useless here: it would reject "C++", "C#", ".NET" and split "Node.js".
+  // Instead require that a match isn't glued to another identifier character.
+  return new RegExp(
+    `(?<![A-Za-z0-9+#.])(?:${terms.map(escapeRegExp).join("|")})(?![A-Za-z0-9+#])`,
+    "gi"
+  );
+};
+
+// Returns HTML: everything is escaped, then matches are wrapped. Escaping first and
+// injecting after would corrupt tags; this interleaves so "JPMorgan Chase & Co." stays safe.
+const boldKeywords = (text, regex) => {
+  if (typeof text !== "string" || !text) return escapeHtml(text);
+  if (!regex) return escapeHtml(text);
+
+  let out = "";
+  let last = 0;
+  let match;
+  regex.lastIndex = 0;
+
+  while ((match = regex.exec(text)) !== null) {
+    if (match[0].length === 0) {
+      regex.lastIndex++;
+      continue;
+    }
+    out += escapeHtml(text.slice(last, match.index));
+    out += `<strong>${escapeHtml(match[0])}</strong>`;
+    last = match.index + match[0].length;
+  }
+
+  return out + escapeHtml(text.slice(last));
+};
+
 // Cache template compilation
 const templateCacheByPath = new Map();
 
@@ -362,7 +424,55 @@ const tryParseResumeJson = (rawContent) => {
   return { ok: false, error: "JSON parse failed after repair attempts" };
 };
 
+// Mirrors the HARD CAP in prompt section 4. The prompt asks for <= 40; this is the
+// backstop for when the model overshoots anyway.
+const SKILLS_HARD_CAP = 40;
+
+const countSkills = (skills) =>
+  Object.values(skills || {}).reduce((n, v) => n + (Array.isArray(v) ? v.length : 0), 0);
+
+const capSkills = (skills, cap = SKILLS_HARD_CAP) => {
+  if (!skills || typeof skills !== "object" || Array.isArray(skills)) return skills;
+
+  const capped = {};
+  for (const [key, value] of Object.entries(skills)) {
+    capped[key] = Array.isArray(value) ? [...value] : value;
+  }
+
+  let total = countSkills(capped);
+  if (total <= cap) return capped;
+
+  const before = total;
+
+  // Section 4 orders each category Tier-1 first, so the tail of a category is its
+  // least JD-critical entry. Always trim the currently-largest category to keep
+  // categories balanced, and never empty one out.
+  while (total > cap) {
+    let largestKey = null;
+    let largestLen = 1;
+
+    for (const [key, value] of Object.entries(capped)) {
+      if (Array.isArray(value) && value.length > largestLen) {
+        largestLen = value.length;
+        largestKey = key;
+      }
+    }
+
+    if (!largestKey) break;
+
+    capped[largestKey].pop();
+    total--;
+  }
+
+  console.warn(`⚠️ Skills over cap: ${before} -> trimmed to ${total} (cap ${cap})`);
+  return capped;
+};
+
 const normalizeResumeContent = (resumeContent) => {
+  if (resumeContent.skills && typeof resumeContent.skills === "object") {
+    resumeContent.skills = capSkills(resumeContent.skills);
+  }
+
   if (Array.isArray(resumeContent.summary)) {
     resumeContent.summary = resumeContent.summary.filter(Boolean).join(" ");
   } else if (typeof resumeContent.summary === "string") {
@@ -619,6 +729,51 @@ export default async function handler(req, res) {
         ? `${jd.slice(0, 8000)}\n\n[Job description truncated for length.]`
         : jd;
 
+    const hasGoogleExperience =
+      Array.isArray(profileData.experience) &&
+      profileData.experience.some((job) => /\bgoogle\b/i.test(job.company || ""));
+
+    const googleTechRealismSection = hasGoogleExperience
+      ? `
+**6B. GOOGLE TECHNOLOGY REALISM (STRICT — CANDIDATE HAS GOOGLE WORK HISTORY)**
+
+Google does NOT use the technologies on the left of each pair. In bullets for the Google employment entry, NEVER name a left-side item — write the Google equivalent instead.
+
+MANDATORY SUBSTITUTIONS (Google entry bullets):
+- React -> Angular
+- React Native -> Kotlin (Android) or Swift (iOS)
+- C#, Ruby, PHP, and JavaScript/TypeScript backend frameworks or libraries (Node.js, Express, NestJS, .NET, Rails, Laravel) -> Java, Go, or C++
+- AWS, Azure (and their services) -> GCP equivalents
+- AI tooling -> Google Gemini (NEVER Copilot, Cursor, Claude, ChatGPT)
+
+SKILLS COUPLING (CRITICAL):
+- Every substitute used in a Google bullet MUST also appear in SKILLS (section 4), even if the JOB DESCRIPTION never mentions it
+- Place it in the track-appropriate existing category — do NOT create a Google-specific category
+- This is the ONE exception to JD-driven skills selection: the candidate's real Google employment is the supporting evidence
+- Substitutes rank WITH Tier-1 must-haves under the section 4 HARD CAP — never drop one to meet the cap; drop aspirational/adjacent/Tier-2 instead
+- Adding a substitute does NOT raise the 40-skill cap. If the list is full, the substitute displaces a lower-priority skill rather than extending the list
+
+SCOPE (STRICT):
+- Applies ONLY to the Google employment entry. Other employers keep their authentic stacks — if a non-Google job genuinely used React or AWS, that stays
+- Frontend JavaScript/TypeScript stays valid at Google when paired with Angular. Substitute JS/TS only for BACKEND work
+- Do NOT reshape TITLE or SUMMARY into a Google-only stack unless the rest of the work history supports it
+
+FORBIDDEN in Google bullets:
+- React, React Native, Vue.js, Next.js
+- C#, .NET, Ruby, Ruby on Rails, PHP, Laravel
+- Node.js, Express, NestJS, or any JS/TS backend runtime
+- AWS, Azure, Lambda, EC2, S3, DynamoDB, Azure DevOps
+- GitHub Copilot, Cursor, Claude, ChatGPT, OpenAI
+
+Section 6 timeline realism still applies (Angular: 2016 | Go: 2009 | Kotlin: 2011 | Swift: 2014 | GCP: 2011 | Gemini: 2023).
+`
+      : "";
+
+    const googleChecklistItem = hasGoogleExperience
+      ? `
+- Google entries name only Google-real technologies, and every substitute also appears in SKILLS`
+      : "";
+
     // AI PROMPT: Realism-first ATS resume generation (all SWE tracks)
     const prompt = `Realism-first ATS resume expert for software engineering roles across all tracks (full stack, frontend, backend, QA/SDET, AI/ML, DevOps/SRE, data engineering/analytics, Salesforce, platform, security, and general software engineer). Generate resume JSON: {"title":"...","summary":"...","skills":{...},"experience":[...]}
 
@@ -822,9 +977,19 @@ RULES:
 
 30-40 skills across 6-8 categories. Category NAMES and contents must match the detected track.
 
+HARD CAP (OVERRIDES EVERY OTHER RULE IN THIS SECTION):
+- Maximum 40 skills TOTAL across all categories combined. Count them before you output.
+- A dense JD does NOT license a longer list — the cap is fixed, the JD is not.
+- If covering everything would exceed 40, drop in this exact order until at or under 40:
+  1. aspirational
+  2. adjacent/supporting
+  3. Tier-2 preferred
+- NEVER drop a Tier-1 must-have to meet the cap.
+- If Tier-1 must-haves ALONE exceed 40, output the Tier-1 set only and stop — Tier-1 is the only thing the cap yields to.
+
 JD ALIGNMENT:
 - Every Tier-1 must-have skill from section 1 must appear in skills (use exact JD phrasing where reasonable for ATS)
-- Tier-2 preferred skills: include when plausible from history
+- Tier-2 preferred skills: include when plausible from history AND the cap still allows
 - Order categories so Tier-1 skills appear early within each category
 
 Use track-appropriate category sets (pick one set; do not mix unrelated stacks):
@@ -835,7 +1000,7 @@ Use track-appropriate category sets (pick one set; do not mix unrelated stacks):
 - AI/ML: ML/DL Frameworks, MLOps & Deployment, Data & Feature Engineering, LLM/NLP (only if plausible), Cloud & Tools
 - Salesforce: Platform (Apex, LWC, Flows), Integrations, Data/CRM, DevOps/Release, Adjacent Enterprise Tools
 
-REALISM PRINCIPLES:
+REALISM PRINCIPLES (proportions WITHIN the capped list — never a reason to grow it past 40):
 - 50-60% primary stack for the target track (real usage only)
 - 30-40% adjacent/supporting skills for that track
 - 10% aspirational (ONLY if plausible for the role)
@@ -960,7 +1125,7 @@ Technology release examples (verify against job dates):
 - Angular: 2016 | React: 2013 | TypeScript: 2012 | Vue.js: 2014 | Next.js: 2016
 - Docker: 2013 | Kubernetes: 2014 | AWS Lambda: 2014 | GraphQL: 2015
 - Pre-2013 frontend: jQuery, Backbone.js, AngularJS 1.x | Pre-2013 backend: PHP, Java, .NET, Ruby on Rails
-
+${googleTechRealismSection}
 **7. PAST EMPLOYER CONTEXT RULE (CRITICAL)**
 
 "Company" here means each entry in the candidate WORK history — NOT the hiring employer from the JD.
@@ -1014,7 +1179,7 @@ Before output:
 - Company context is preserved
 - Tech matches timeline realism
 - Keywords are natural, not forced
-- Balance exists between ATS depth and human readability — depth beats brevity for entry 1-2
+- Balance exists between ATS depth and human readability — depth beats brevity for entry 1-2${googleChecklistItem}
 
 **OUTPUT (STRICT)**
 
@@ -1072,6 +1237,7 @@ JSON RULES:
 
     console.log("✅ AI content generated successfully");
     console.log("Skills categories:", Object.keys(resumeContent.skills).length);
+    console.log("Skills total:", countSkills(resumeContent.skills), `(cap ${SKILLS_HARD_CAP})`);
     console.log("Experience entries:", resumeContent.experience.length);
     
     // Debug: Check if experience has details
@@ -1085,6 +1251,16 @@ JSON RULES:
     // Get cached template (compiled once per file, reused)
     const templateFn = getTemplate(profile);
 
+    // Bold every Skills term where it appears in summary/experience — but only for
+    // profiles whose template renders HTML. Others get plain text, unchanged.
+    const boldEnabled = BOLD_KEYWORD_PROFILES.has(profile);
+    const keywordRegex = boldEnabled ? buildKeywordRegex(resumeContent.skills) : null;
+    const decorate = (text) => (boldEnabled ? boldKeywords(text, keywordRegex) : text);
+
+    if (boldEnabled) {
+      console.log("Keyword bolding: on,", countSkills(resumeContent.skills), "terms");
+    }
+
     // Prepare data for template
     const templateData = {
       name: profileData.name,
@@ -1094,7 +1270,7 @@ JSON RULES:
       location: profileData.location,
       linkedin: profileData.linkedin,
       website: profileData.website,
-      summary: resumeContent.summary,
+      summary: decorate(resumeContent.summary),
       skills: resumeContent.skills,
       experience: profileData.experience.map((job, idx) => ({
         title: job.title || resumeContent.experience[idx]?.title || "Engineer",
@@ -1102,7 +1278,7 @@ JSON RULES:
         location: job.location,
         start_date: job.start_date,
         end_date: job.end_date,
-        details: resumeContent.experience[idx]?.details || []
+        details: (resumeContent.experience[idx]?.details || []).map(decorate)
       })),
       education: profileData.education
     };
@@ -1174,7 +1350,7 @@ JSON RULES:
       printBackground: true,
       margin: { 
         top: "15mm", 
-        bottom: "15mm", 
+        bottom: "7mm", 
         left: "0mm", 
         right: "0mm" 
       },
@@ -1185,13 +1361,10 @@ JSON RULES:
 
     console.log("PDF generated successfully!");
     
-    // Generate filename from profile name, company and role
-    // Move sanitize function outside to avoid recreation (though it's only called 3 times)
-    const sanitizeFilename = (str) => str.replace(/[^a-z0-9]/gi, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
-    const filename = `${sanitizeFilename(profileData.name)}_${sanitizeFilename(company)}_${sanitizeFilename(role)}.pdf`;
-    
+    // No Content-Disposition here on purpose. The client downloads through a blob: URL
+    // (pages/index.js), and blob URLs discard response headers — only a.download names
+    // the file. A filename set here would be silently ignored while looking authoritative.
     res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
     res.end(pdfBuffer);
     
 

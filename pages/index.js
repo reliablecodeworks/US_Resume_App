@@ -1,7 +1,19 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 
-// Move utility function outside component to avoid recreation
-const sanitizeFilename = (str) => str.replace(/[^a-z0-9]/gi, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
+// Filename parts keep spaces, hyphens and accents; only characters the filesystem
+// actually rejects are dropped. This is what names the downloaded file — the API's
+// Content-Disposition header is ignored, because the download goes through a blob: URL.
+const sanitizeFilenamePart = (str) =>
+  Array.from(String(str ?? ""))
+    .filter((ch) => ch.charCodeAt(0) >= 32)
+    .join("")
+    .replace(/[<>:"/\\|?*]/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\.+$/, "");
+
+const buildResumeFilename = (name, role, company) =>
+  `${sanitizeFilenamePart(name)}-${sanitizeFilenamePart(role)}-${sanitizeFilenamePart(company)}.pdf`;
 
 // Memoize static styles outside component
 const containerStyle = {
@@ -187,13 +199,10 @@ export default function Home() {
       const a = document.createElement("a");
       a.href = url;
       
-      // Generate filename from profile name, company and role
+      // [Profile name]-[Role]-[Company].pdf
       const profileName = selectedProfileData ? selectedProfileData.name : selectedProfile;
-      const profileSanitized = sanitizeFilename(profileName);
-      const companySanitized = sanitizeFilename(company);
-      const roleSanitized = sanitizeFilename(role);
-      const filename = `${profileSanitized}_${companySanitized}_${roleSanitized}.pdf`;
-      
+      const filename = buildResumeFilename(profileName, role, company);
+
       a.download = filename;
       a.click();
       window.URL.revokeObjectURL(url);

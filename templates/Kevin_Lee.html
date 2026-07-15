@@ -132,6 +132,8 @@
         line-height: 1.4;
         margin-bottom: 2px;
         text-align: justify;
+        page-break-inside: avoid;
+        break-inside: avoid;
       }
 
       /* Education */
@@ -192,7 +194,7 @@
     {{#if summary}}
     <section>
       <h2>Summary</h2>
-      <p class="summary">{{summary}}</p>
+      <p class="summary">{{{summary}}}</p>
     </section>
     {{/if}} {{#if skills}}
     <section>
@@ -221,7 +223,7 @@
         {{#if details}}
         <ul class="exp-details">
           {{#each details}}
-          <li>{{this}}</li>
+          <li>{{{this}}}</li>
           {{/each}}
         </ul>
         {{/if}}
