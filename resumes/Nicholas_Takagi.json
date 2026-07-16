@@ -1,0 +1,47 @@
+{
+    "name": "Nicholas Takagi",
+    "email": "nicholastak@outlook.com",
+    "phone": "",
+    "location": "Warsaw, Poland",
+    "linkedin": "",
+    "website": "",
+    
+    "experience": [
+       {
+        "company": "Flink",
+        "title": "Senior Software Engineer",
+        "location": "Berlin, Germany",
+        "start_date": "2024.06",
+        "end_date": "Present"
+      },
+      {
+        "company": "Uber",
+        "title": "Senior Software Engineer",
+        "location": "Warsaw, Poland",
+        "start_date": "2019.05",
+        "end_date": "2024.06"
+      },
+      {
+        "company": "Uber",
+        "title": "Software Engineer",
+        "location": "Tokyo, Japan",
+        "start_date": "2017.01",
+        "end_date": "2019.04"
+      },   
+      {
+        "company": "Amazon",
+        "title": "Software engineering Intern",
+        "location": "Tokyo, Japan",
+        "start_date": "2016.06",
+        "end_date": "2016.12"
+      }
+    ],
+    "education": [
+      {
+        "degree": "Bachelor's Degree in Computer Science",
+        "school": "Tsinghua University",
+        "start_year": "2012",
+        "end_year": "2016"
+      }
+    ]
+  }

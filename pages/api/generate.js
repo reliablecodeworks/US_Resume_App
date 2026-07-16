@@ -158,7 +158,7 @@ const calculateYears = (experience) => {
 // Profiles whose template renders raw HTML (triple-brace {{{summary}}} / {{{this}}}) and
 // can therefore show bolded keywords. Adding a profile here WITHOUT switching its template
 // to triple-brace prints literal <strong> tags on the PDF.
-const BOLD_KEYWORD_PROFILES = new Set(["Kevin_Lee"]);
+const BOLD_KEYWORD_PROFILES = new Set(["Kevin_Lee", "Marcin_Pham", "Nicholas_Takagi"]);
 
 const escapeHtml = (str) =>
   String(str ?? "")

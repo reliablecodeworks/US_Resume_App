@@ -1,0 +1,48 @@
+{
+  "name": "Marcin Pham",
+  "email": "m.pham.dev@outlook.com",
+  "phone": "",
+  "location": "Krakow, Poland",
+  "linkedin": "https://www.linkedin.com/in/marcin-pham-a3287b3a3/",
+  "website": "",
+  
+  "experience": [
+     {
+      "company": "Coreblue",
+      "title": "Senior Software Engineer",
+      "location": "London, UK",
+      "start_date": "Feb 2024",
+      "end_date": "Present"
+    },
+    {
+      "company": "Comarch",
+      "title": "Senior Software Engineer",
+      "location": "Krakow, Poland",
+      "start_date": "Jan 2020",
+      "end_date": "Jan 2024"
+    },
+    {
+      "company": "Comarch",
+      "title": "Software Engineer",
+      "location": "Tokyo, Japan",
+      "start_date": "Sep 2017",
+      "end_date": "Dec 2019"    
+    }
+  ],
+  "education": [
+    {
+      "degree": "Master's degree in Computer Science",
+      "school": "Nanyang Technological University Singapore",
+      "location": "Singapore",
+      "start_year": "2015",
+      "end_year": "2017"
+    },
+    {
+      "degree": "Bachelor's degree in Computer Science",
+      "school": "Nanyang Technological University Singapore",
+      "location": "Singapore",
+      "start_year": "2011",
+      "end_year": "2015"
+    }
+  ]
+}
